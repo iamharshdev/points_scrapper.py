@@ -45,12 +45,9 @@ def scrap():
         t=t.strip()
         atag=i.a
         a=atag.get('href')
-    for i in imgs:
-        try:
+        for i in imgs:
             i=i["data-src-template"].replace("BINARY/thumbnail", "alternates/FREE_960")
             r.append({'title':t,'link':a,'img':i})
-        except:
-            continue
 
     link2 = "https://www.indiatoday.in/coronavirus-covid-19-outbreak"
     data2 = rq.get(link2)
@@ -91,11 +88,8 @@ def scrap():
         linkindia=h.get('href')
         imginida=h.img
         imginida=imginida.get('src')
-        try:
-            r.append({'title':titleindia,'link':linkindia,'img':imginida})
-        except :
-            continue
-    random.shuffle(r)        
+        r.append({'title':titleindia,'link':linkindia,'img':imginida})
+    random.shuffle(r)
     return r
 
 class UserAPI(Resource):
