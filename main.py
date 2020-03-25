@@ -33,22 +33,6 @@ def scrap():
         articlelink=articlelink.get('href')
         r.append({'title':articletitle,'link':articlelink,'img':articleimg})
 
-    link = "https://www.thehindu.com/topic/coronavirus/"
-    data = rq.get(link)
-    soup = bs4.BeautifulSoup(data.content, "lxml")
-    divs = soup.find_all("div", {"class": "story-card"})
-    imgs = []
-    for i in divs:
-        imgs.append(i.find("img", {"class": "media-object lazy adaptive placeholder"}))
-        t=i.h3
-        t=t.text
-        t=t.strip()
-        atag=i.a
-        a=atag.get('href')
-        for i in imgs:
-            i=i["data-src-template"].replace("BINARY/thumbnail", "alternates/FREE_960")
-            r.append({'title':t,'link':a,'img':i})
-
     link2 = "https://www.indiatoday.in/coronavirus-covid-19-outbreak"
     data2 = rq.get(link2)
     soup2 = bs4.BeautifulSoup(data2.content, "lxml")
