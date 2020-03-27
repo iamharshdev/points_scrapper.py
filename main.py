@@ -25,9 +25,12 @@ def scrap():
         articletitle=p.h2
         articletitle=articletitle.text
         articletitle=articletitle.strip()
-        articleimg=p.img
-        articleimg=articleimg.get('src')
-        articleimg=articleimg.replace('w=300&h=160','w=730')
+        if p.img:
+            articleimg=p.img
+            articleimg=articleimg.get('src')
+            articleimg=articleimg.replace('w=300&h=160','w=730')
+        else:
+            articleimg='https://source.unsplash.com/featured/?coronavirus'
         articlelink=p.a
         articlelink=articlelink.get('href')
         try:
@@ -40,13 +43,16 @@ def scrap():
     soup2 = bs4.BeautifulSoup(data2.content, "lxml")
     divs2 = soup2.find_all("div", {"class": "catagory-listing"})
     for news in divs2:
-        img=news.img
-        img=img.get('src')
-        img=img.replace('170x96','647x363')
         title=news.h2
         title=title.text
         title=title.strip()
         alink=news.a
+        if news.img:
+            img=news.img
+            img=img.get('src')
+            img=img.replace('170x96','647x363')
+        else:
+            img='https://source.unsplash.com/featured/?coronavirus'    
         try:
             r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
             'img':img})
