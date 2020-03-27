@@ -52,7 +52,7 @@ def scrap():
             img=img.get('src')
             img=img.replace('170x96','647x363')
         else:
-            img='https://source.unsplash.com/featured/?coronavirus'    
+            img='https://source.unsplash.com/featured/?coronavirus'
         try:
             r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
             'img':img})
@@ -129,10 +129,16 @@ def stats():
 
 class UserAPI(Resource):
     def get(self):
-        r,d=scrap(),stats()
-        return jsonify({'news':r,'stats':d})
+        r=scrap()
+        return jsonify({'news':r})
+
+class UserIndia(Resource):
+    def get(self):
+        d=stats()
+        return jsonify({'stats':d})
 
 api.add_resource(UserAPI, '/')
+api.add_resource(UserIndia, '/stats')
 
 if __name__=='__main__':
     app.run()
