@@ -30,7 +30,10 @@ def scrap():
         articleimg=articleimg.replace('w=300&h=160','w=730')
         articlelink=p.a
         articlelink=articlelink.get('href')
-        r.append({'title':articletitle,'link':articlelink,'img':articleimg})
+        try:
+            r.append({'title':articletitle,'link':articlelink,'img':articleimg})
+        except :
+            continue
 
     link2 = "https://www.indiatoday.in/coronavirus-covid-19-outbreak"
     data2 = rq.get(link2)
@@ -44,22 +47,11 @@ def scrap():
         title=title.text
         title=title.strip()
         alink=news.a
-        r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
-        'img':img})
-
-    link3 = "https://www.indiatoday.in/coronavirus-covid-19-outbreak?page=1"
-    data3 = rq.get(link3)
-    soup3 = bs4.BeautifulSoup(data3.content, "lxml")
-    divs3 = soup3.find_all("div", {"class": "catagory-listing"})
-    for o in divs3:
-        img1=o.img
-        img1=img1.get('src')
-        img1=img1.replace('170x96','647x363')
-        title1=o.h2
-        alink1=o.a
-        # -647x363
-        r.append({'title':title1.text,'link':'https://www.indiatoday.in'+alink1.get('href'),
-        'img':img1})
+        try:
+            r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
+            'img':img})
+        except:
+            continue
 
     indiacom=rq.get('https://news.abplive.com/search?s=coronavirus')
     indiasop=bs4.BeautifulSoup(indiacom.content,'html.parser')
@@ -71,7 +63,41 @@ def scrap():
         linkindia=h.get('href')
         imginida=h.img
         imginida=imginida.get('src')
-        r.append({'title':titleindia,'link':linkindia,'img':imginida})
+        if(imginida=='https://static.abplive.com/frontend/abplive/images/default.png?impolicy=abp_cdn&imwidth=309'):
+            imginida='https://source.unsplash.com/featured/?coronavirus'
+            try:
+                r.append({'title':titleindia,'link':linkindia,'img':imginida})
+            except:
+                continue
+        else:
+            try:
+                r.append({'title':titleindia,'link':linkindia,'img':imginida})
+            except:
+                continue
+
+    linkkreu = "https://www.reuters.com/search/news?blob=Coronavirus&sortBy=relevance&dateRange=pastDay"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+    }
+    reuters=rq.get(linkkreu,headers=headers)
+    reuterssoap=bs4.BeautifulSoup(reuters.content,'html.parser')
+    reutersdiv=reuterssoap.find_all('div',class_='search-result-content')
+    for f in reutersdiv:
+        titlereu=f.h3
+        titlereu=titlereu.text
+        linkreu=f.a
+        linkreu=linkreu.get('href')
+        if(f.img):
+            imgreu=f.img
+            imgreu=imgreu.get('src')
+            imgreu=imgreu.replace('w=116','w=1280')
+        else:
+            imgreu='https://source.unsplash.com/featured/?coronavirus'
+        try:
+            r.append({'title':titlereu,'link':'https://www.reuters.com/article/idUSKBN21D2TN'+linkreu,'img':imgreu})
+        except:
+            continue
+
     random.shuffle(r)
     return r
 
