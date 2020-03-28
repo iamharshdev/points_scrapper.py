@@ -16,6 +16,7 @@ cors=CORS(app,resources={
 
 def scrap():
     r=[]
+    imgsrcsdefault='https://raw.githubusercontent.com/theuitown/COROAPIWEB/master/20200328_183732_0000.png'
     # techcrunchdata
     tech='https://techcrunch.com/tag/coronavirus/'
     datatech=rq.get(tech)
@@ -30,7 +31,7 @@ def scrap():
             articleimg=articleimg.get('src')
             articleimg=articleimg.replace('w=300&h=160','w=730')
         else:
-            articleimg='https://source.unsplash.com/featured/?coronavirus'
+            articleimg=imgsrcsdefault
         articlelink=p.a
         articlelink=articlelink.get('href')
         try:
@@ -52,14 +53,17 @@ def scrap():
             img=img.get('src')
             img=img.replace('170x96','647x363')
         else:
-            img='https://source.unsplash.com/featured/?coronavirus'
+            img=imgsrcsdefault     
         try:
             r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
             'img':img})
         except:
             continue
 
-    indiacom=rq.get('https://news.abplive.com/search?s=coronavirus')
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+    }
+    indiacom=rq.get('https://news.abplive.com/search?s=coronavirus',headers=headers)
     indiasop=bs4.BeautifulSoup(indiacom.content,'html.parser')
     indiadiv=indiasop.find_all('a',class_='news_featured')
     for h in indiadiv:
@@ -70,7 +74,7 @@ def scrap():
         imginida=h.img
         imginida=imginida.get('src')
         if(imginida=='https://static.abplive.com/frontend/abplive/images/default.png?impolicy=abp_cdn&imwidth=309'):
-            imginida='https://source.unsplash.com/featured/?coronavirus'
+            imginida=imgsrcsdefault
             try:
                 r.append({'title':titleindia,'link':linkindia,'img':imginida})
             except:
@@ -98,12 +102,81 @@ def scrap():
             imgreu=imgreu.get('src')
             imgreu=imgreu.replace('w=116','w=1280')
         else:
-            imgreu='https://source.unsplash.com/featured/?coronavirus'
+            imgreu=imgsrcsdefault        
         try:
             r.append({'title':titlereu,'link':'https://www.reuters.com/article/idUSKBN21D2TN'+linkreu,'img':imgreu})
         except:
             continue
 
+    # news nation    
+    nnlink='https://www.newsnation.in/topic/coronavirus-news/'
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+    nn=rq.get(nnlink,headers=headers)
+    nnsoap=bs4.BeautifulSoup(nn.content,'html.parser')
+    nndiv=nnsoap.find_all('div',class_='col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 mt-2')      
+    for y in nndiv:
+        nna=y.a
+        nna=nna.get('href')
+        nna='https://www.newsnation.in'+nna
+        nnimg=y.img
+        nnimg=nnimg.get('src')
+        if(nnimg=='https://static.newsnation.in/nn-web/images/lazy-loading.png'):
+            nnimg=imgsrcsdefault    
+        else:
+            nnimg=nnimg
+        nnt=y.h3
+        nnt=nnt.text
+        try:
+            r.append({'title':nnt,'link':nna,'img':nnimg})
+        except:
+            continue 
+    
+    
+    anilink='https://www.aninews.in/topic/coronavirus/'
+    ani=rq.get(anilink)
+    soap=bs4.BeautifulSoup(ani.content,'html.parser')
+    anidiv=soap.find_all('div',class_='card')
+    for b in anidiv:
+        if(b.img):
+            aniimg=b.img
+            aniimg=aniimg.get('data-src')
+            aniimg=aniimg.replace('/__sized__/','/')
+            aniimg=aniimg.replace('-thumbnail-320x180-70.','.')
+        else:
+            aniimg=imgsrcsdefault
+        tit=b.h6
+        try:
+            tit=tit.text
+        except:
+            continue
+        aani=b.a
+        try:
+            aani=aani.get('href')
+            aani='https://www.aninews.in'+aani
+        except:
+            continue
+        r.append({'title':tit,'link':aani,'img':aniimg})    
+
+    link3 = "https://www.indiatoday.in/coronavirus-covid-19-outbreak?page=1"
+    data3 = rq.get(link3)
+    soup3 = bs4.BeautifulSoup(data3.content, "lxml")
+    divs3 = soup3.find_all("div", {"class": "catagory-listing"})
+    for news in divs3:
+        title=news.h2
+        title=title.text
+        title=title.strip()
+        alink=news.a
+        if news.img:
+            img=news.img
+            img=img.get('src')
+            img=img.replace('170x96','647x363')
+        else:
+            img=imgsrcsdefault     
+        try:
+            r.append({'title':title,'link':'https://www.indiatoday.in'+alink.get('href'),
+            'img':img})
+        except:
+            continue
     random.shuffle(r)
     return r
 
